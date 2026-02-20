@@ -23,6 +23,9 @@ env/
 *.swp
 *.swo
 
+# VESSL 실행 설정 (HF_TOKEN 등 시크릿 포함)
+vessl.yaml
+
 # 기타
 *.pdf
 *.png
