@@ -4,7 +4,10 @@ import time
 from huggingface_hub import HfApi
 
 api = HfApi()
-repo_id = "Seongryun951/eigenscore-results"
+username = api.whoami()["name"]
+repo_id = f"{username}/eigenscore-results"
+print(f"HF account: {username}")
+print(f"Uploading to: https://huggingface.co/datasets/{repo_id}")
 api.create_repo(repo_id, repo_type="dataset", private=True, exist_ok=True)
 
 output_dir = os.path.join(os.path.dirname(__file__), "output")
