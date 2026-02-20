@@ -2,14 +2,14 @@
 torch>=2.1.0
 torchvision>=0.16.0
 torchaudio>=2.1.0
-vllm>=0.4.0
+vllm>=0.4.0,<0.6.0
 
-# Hugging Face ecosystem
-transformers>=4.36.0
-accelerate>=0.25.0
-datasets>=2.16.0
+# Hugging Face ecosystem (PyTorch 2.3.x 호환 버전 고정)
+transformers>=4.36.0,<4.46.0
+accelerate>=0.25.0,<1.0.0
+datasets>=2.16.0,<3.0.0
 evaluate>=0.4.0
-sentence-transformers>=2.3.0
+sentence-transformers>=2.3.0,<3.0.0
 
 # Metrics & Evaluation
 torchmetrics>=1.2.0
