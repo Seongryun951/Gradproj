@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# 결과 파일 (너무 큼)
+eigenscore/output/
+eigenscore/data/output/
+*.pkl
+*.log
+run_*.log
+
+# 가상환경
+venv/
+env/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# 기타
+*.pdf
+*.png
+*.jpg
+.DS_Store
