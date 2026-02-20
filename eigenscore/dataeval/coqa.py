@@ -9,57 +9,51 @@ from datasets import Dataset
 import _settings
 
 
-def _save_dataset():
+@functools.lru_cache(1)
+def _build_dataset():
     # https://github.com/lorenzkuhn/semantic_uncertainty/blob/main/code/parse_coqa.py
-    save_path = f'{_settings.DATA_FOLDER}/coqa_dataset'
-    if not os.path.exists(save_path):
-        # https://downloads.cs.stanford.edu/nlp/data/coqa/coqa-dev-v1.0.json
-        with open(f'{_settings.DATA_FOLDER}/coqa-dev-v1.0.json', 'r') as infile:
-            data = json.load(infile)['data']
+    with open(f'{_settings.DATA_FOLDER}/coqa-dev-v1.0.json', 'r') as infile:
+        data = json.load(infile)['data']
 
-        dataset = {}
+    dataset = {}
 
-        dataset['story'] = []
-        dataset['question'] = []
-        dataset['answer'] = []
-        dataset['additional_answers'] = []
-        dataset['id'] = []
+    dataset['story'] = []
+    dataset['question'] = []
+    dataset['answer'] = []
+    dataset['additional_answers'] = []
+    dataset['id'] = []
 
-        for sample_id, sample in enumerate(data):
-            story = sample['story']
-            questions = sample['questions']
-            answers = sample['answers']
-            additional_answers = sample['additional_answers']
-            for question_index, question in enumerate(questions):
-                dataset['story'].append(story)
-                dataset['question'].append(question['input_text'])
-                dataset['answer'].append({
-                    'text': answers[question_index]['input_text'],
-                    'answer_start': answers[question_index]['span_start']
-                })
-                dataset['id'].append(sample['id'] + '_' + str(question_index))
-                additional_answers_list = []
+    for sample_id, sample in enumerate(data):
+        story = sample['story']
+        questions = sample['questions']
+        answers = sample['answers']
+        additional_answers = sample['additional_answers']
+        for question_index, question in enumerate(questions):
+            dataset['story'].append(story)
+            dataset['question'].append(question['input_text'])
+            dataset['answer'].append({
+                'text': answers[question_index]['input_text'],
+                'answer_start': answers[question_index]['span_start']
+            })
+            dataset['id'].append(sample['id'] + '_' + str(question_index))
+            additional_answers_list = []
 
-                for i in range(3):
-                    additional_answers_list.append(additional_answers[str(i)][question_index]['input_text'])
+            for i in range(3):
+                additional_answers_list.append(additional_answers[str(i)][question_index]['input_text'])
 
-                dataset['additional_answers'].append(additional_answers_list)
+            dataset['additional_answers'].append(additional_answers_list)
 
-        dataset_df = pd.DataFrame.from_dict(dataset)
-
-        dataset = Dataset.from_pandas(dataset_df)
-
-        dataset.save_to_disk(save_path)
-    return save_path
+    dataset_df = pd.DataFrame.from_dict(dataset)
+    return Dataset.from_pandas(dataset_df)
 
 @functools.lru_cache(1)
 def read_all_contexts():
-    dataset = datasets.load_from_disk(_save_dataset())
+    dataset = _build_dataset()
     return {_['id']: _['story'] for _ in dataset}
 
 def get_dataset(tokenizer, split='validation'):
     # from https://github.com/lorenzkuhn/semantic_uncertainty/blob/main/code/parse_coqa.py
-    dataset = datasets.load_from_disk(_save_dataset())
+    dataset = _build_dataset()
     id_to_question_mapping = dict(zip(dataset['id'], dataset['question']))
 
     def encode_coqa(example):
